@@ -15,7 +15,7 @@ app.AddCommand("validate", ([Option(name: "output", shortNames: new char[] {'o'}
 
 await app.RunAsync();
 
-void ValidateToken(string token, bool? print)
+void ValidateToken(string token, bool print)
 {
     var tokenHandler = new JwtSecurityTokenHandler();
     var jwtValid = tokenHandler.CanReadToken(token);
@@ -26,7 +26,7 @@ void ValidateToken(string token, bool? print)
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Valid");
-        if(print != null && print == true)
+        if(print)
         {
             Console.ForegroundColor = ConsoleColor.White;
             var parsedToken = tokenHandler.ReadJwtToken(token);
