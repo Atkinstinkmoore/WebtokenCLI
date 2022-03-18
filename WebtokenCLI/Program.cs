@@ -6,14 +6,16 @@ var builder = CoconaApp.CreateBuilder();
 
 var app = builder.Build();
 
-app.AddCommand("validate", ([Option(name: "output", shortNames: new char[] {'o'}, Description = "Prints the parsed token to the console if valid" )] bool print,
-    [Argument(Description = "The string to validate")]string token) =>
+app.AddCommand("validate", (TokenParserCommands commonParameters, [Argument(Description = "The string to validate")]string token) =>
 {
-    ValidateToken(token, print);
+    ValidateToken(token, commonParameters.print);
 
 }).WithDescription("Checks if a string is a valid JWToken");
 
+
+
 await app.RunAsync();
+
 
 void ValidateToken(string token, bool print)
 {
@@ -24,18 +26,31 @@ void ValidateToken(string token, bool print)
 
     if (jwtValid)
     {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Valid");
-        if(print)
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            var parsedToken = tokenHandler.ReadJwtToken(token);
-            Console.WriteLine(parsedToken);
-        }
+        PrintValid(token, print, tokenHandler);
     }
     else
     {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Invalid");
+        PrintInvalid();
     }
 }
+
+void PrintInvalid()
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("Invalid");
+}
+
+void PrintValid(string token, bool print, JwtSecurityTokenHandler tokenHandler)
+{
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("Valid");
+    if (print)
+    {
+        Console.ForegroundColor = ConsoleColor.White;
+        var parsedToken = tokenHandler.ReadJwtToken(token);
+        Console.WriteLine(parsedToken);
+    }
+}
+record TokenParserCommands(
+    [Option(name: "output", shortNames: new char[] { 'o' }, Description = "Prints the parsed token to the console if valid")] bool print = false
+    ) : ICommandParameterSet;
